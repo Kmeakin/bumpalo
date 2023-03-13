@@ -6,6 +6,11 @@ struct Small(u8);
 #[derive(Default)]
 struct Big([usize; 32]);
 
+fn with_capacity(n: usize) {
+    let arena = bumpalo::Bump::with_capacity(n);
+    black_box(arena);
+}
+
 fn alloc<T: Default>(n: usize) {
     let arena = bumpalo::Bump::with_capacity(n * std::mem::size_of::<T>());
     for _ in 0..n {
@@ -90,6 +95,15 @@ fn format_realloc(bump: &bumpalo::Bump, n: usize) {
 }
 
 const ALLOCATIONS: usize = 10_000;
+
+fn bench_with_capacity(c: &mut Criterion) {
+    let mut group = c.benchmark_group("with_capacity");
+    group.bench_function("0B", |b| b.iter(|| with_capacity(0)));
+    group.bench_function("1B", |b| b.iter(|| with_capacity(1)));
+    group.bench_function("1KiB", |b| b.iter(|| with_capacity(1024)));
+    group.bench_function("1MiB", |b| b.iter(|| with_capacity(1024 * 1024)));
+    group.bench_function("1GiB", |b| b.iter(|| with_capacity(1024 * 1024 * 1024)));
+}
 
 fn bench_alloc(c: &mut Criterion) {
     let mut group = c.benchmark_group("alloc");
@@ -204,6 +218,7 @@ fn bench_format_realloc(c: &mut Criterion) {
 
 criterion_group!(
     benches,
+    bench_with_capacity,
     bench_alloc,
     bench_alloc_with,
     bench_alloc_try_with,
