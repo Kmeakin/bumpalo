@@ -353,6 +353,7 @@ static EMPTY_CHUNK: EmptyChunkFooter = EmptyChunkFooter(ChunkFooter {
 });
 
 impl EmptyChunkFooter {
+    #[inline]
     fn get(&'static self) -> NonNull<ChunkFooter> {
         unsafe { NonNull::new_unchecked(&self.0 as *const ChunkFooter as *mut ChunkFooter) }
     }
@@ -491,6 +492,7 @@ impl Bump {
     /// let bump = bumpalo::Bump::new();
     /// # let _ = bump;
     /// ```
+    #[inline]
     pub fn new() -> Bump {
         Self::with_capacity(0)
     }
@@ -503,6 +505,7 @@ impl Bump {
     /// let bump = bumpalo::Bump::try_new();
     /// # let _ = bump.unwrap();
     /// ```
+    #[inline]
     pub fn try_new() -> Result<Bump, AllocErr> {
         Bump::try_with_capacity(0)
     }
@@ -515,6 +518,7 @@ impl Bump {
     /// let bump = bumpalo::Bump::with_capacity(100);
     /// # let _ = bump;
     /// ```
+    #[inline]
     pub fn with_capacity(capacity: usize) -> Bump {
         Bump::try_with_capacity(capacity).unwrap_or_else(|_| oom())
     }
@@ -527,6 +531,7 @@ impl Bump {
     /// let bump = bumpalo::Bump::try_with_capacity(100);
     /// # let _ = bump.unwrap();
     /// ```
+    #[inline]
     pub fn try_with_capacity(capacity: usize) -> Result<Self, AllocErr> {
         if capacity == 0 {
             return Ok(Bump {
@@ -621,6 +626,7 @@ impl Bump {
     /// Determine the memory details including final size, alignment and
     /// final size without footer for a new chunk that would be allocated
     /// to fulfill an allocation request.
+    #[inline]
     fn new_chunk_memory_details(
         new_size_without_footer: Option<usize>,
         requested_layout: Layout,
@@ -671,6 +677,7 @@ impl Bump {
     /// If given, `layouts` is a tuple of the current chunk size and the
     /// layout of the allocation request that triggered us to fall back to
     /// allocating a new chunk of memory.
+    #[inline]
     unsafe fn new_chunk(
         new_chunk_memory_details: NewChunkMemoryDetails,
         requested_layout: Layout,
